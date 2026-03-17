@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>验证页面</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding-top: 100px;
+      background-color: #f0f0f0;
+    }
+    .captcha-box {
+      display: inline-block;
+      padding: 20px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin-top: 20px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="captcha-box">
+    <h2>请验证你不是机器人</h2>
+    <p>点击下面的按钮继续</p>
+    <button onclick="verify()">我不是机器人</button>
+  </div>
+
+  <script>
+    function verify() {
+      // 假装验证通过，延迟 1 秒跳转
+      alert("验证通过！");
+      setTimeout(function() {
+        window.location.href = "main.html"; // 跳转到 main.html
+      }, 1000);
+    }
+  </script>
+</body>
+</html>
