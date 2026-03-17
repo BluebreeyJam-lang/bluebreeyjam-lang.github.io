@@ -1,45 +1,151 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <title>验证页面</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding-top: 100px;
-      background-color: #f0f0f0;
-    }
-    .captcha-box {
-      display: inline-block;
-      padding: 20px;
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-    button {
-      padding: 10px 20px;
-      font-size: 16px;
-      margin-top: 20px;
-      cursor: pointer;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>人机验证 - 请证明你不是机器人</title>
+    <style>
+        body {
+            font-family: "Microsoft YaHei", sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .captcha-box {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            width: 350px;
+            text-align: center;
+        }
+        .header {
+            background: #4A90E2;
+            color: white;
+            padding: 15px;
+            margin: -20px -20px 20px -20px;
+            border-radius: 8px 8px 0 0;
+            text-align: left;
+        }
+        .header h2 { margin: 0; font-size: 18px; }
+        .header p { margin: 5px 0 0 0; font-size: 14px; }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .option {
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+        .option:hover { transform: scale(1.02); }
+        .option img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            display: block;
+        }
+        .info-text {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+    </style>
 </head>
 <body>
-  <div class="captcha-box">
-    <h2>请验证你不是机器人</h2>
-    <p>点击下面的按钮继续</p>
-    <button onclick="verify()">我不是机器人</button>
-  </div>
 
-  <script>
-    function verify() {
-      // 假装验证通过，延迟 1 秒跳转
-      alert("验证通过！");
-      setTimeout(function() {
-        window.location.href = "main.html"; // 跳转到 main.html
-      }, 1000);
+<div class="captcha-box">
+    <div class="header">
+        <p>请选择</p>
+        <h2 id="question-title">正在加载...</h2>
+    </div>
+    
+    <div class="grid" id="image-grid">
+        </div>
+
+    <div class="info-text" id="step-indicator">第 1 / 3 步</div>
+</div>
+
+<script>
+    // 题目数据
+    const questions = [
+        {
+            title: "核舟记中的核舟",
+            options: [
+                { name: "核舟", isCorrect: true, src: "hezhou.jpg" },
+                { name: "集装箱货船", isCorrect: false, src: "ship.jpg" },
+                { name: "赛艇", isCorrect: false, src: "rowing.jpg" },
+                { name: "自然选择号", isCorrect: false, src: "natural_selection.jpg" }
+            ]
+        },
+        {
+            title: "苏轼",
+            options: [
+                { name: "毛泽东", isCorrect: false, src: "mao.jpg" },
+                { name: "苏轼", isCorrect: true, src: "sushi.jpg" },
+                { name: "希特勒", isCorrect: false, src: "hitler.jpg" },
+                { name: "特朗普", isCorrect: false, src: "trump.jpg" }
+            ]
+        },
+        {
+            title: "弥勒",
+            options: [
+                { name: "墨索里尼", isCorrect: false, src: "mussolini.jpg" },
+                { name: "如来", isCorrect: false, src: "rulai.jpg" },
+                { name: "孙中山", isCorrect: false, src: "sun.jpg" },
+                { name: "弥勒", isCorrect: true, src: "mile.jpg" }
+            ]
+        }
+    ];
+
+    let currentStep = 0;
+
+    function loadQuestion() {
+        const question = questions[currentStep];
+        document.getElementById('question-title').innerText = question.title;
+        document.getElementById('step-indicator').innerText = `第 ${currentStep + 1} / 3 步`;
+        
+        const grid = document.getElementById('image-grid');
+        grid.innerHTML = ''; // 清空当前选项
+
+        // 打乱选项顺序，防止背位置
+        const shuffledOptions = [...question.options].sort(() => Math.random() - 0.5);
+
+        shuffledOptions.forEach(opt => {
+            const div = document.createElement('div');
+            div.className = 'option';
+            div.innerHTML = `<img src="${opt.src}" alt="${opt.name}" title="点击选择">`;
+            div.onclick = () => handleChoice(opt.isCorrect);
+            grid.appendChild(div);
+        });
     }
-  </script>
+
+    function handleChoice(isCorrect) {
+        if (isCorrect) {
+            currentStep++;
+            if (currentStep < questions.length) {
+                loadQuestion();
+            } else {
+                alert("验证通过！正在跳转...");
+                window.location.href = "main.html"; // 跳转到目标页面
+            }
+        } else {
+            alert("验证失败，请重新开始！");
+            currentStep = 0;
+            loadQuestion();
+        }
+    }
+
+    // 初始化第一题
+    loadQuestion();
+</script>
+
 </body>
 </html>
