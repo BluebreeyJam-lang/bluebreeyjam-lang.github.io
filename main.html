@@ -1,12 +1,39 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
-<meta charset="utf-8">
-<title>???</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loading...</title>
+    <style>
+        /* 移除边距并隐藏滚动条，使页面完全被 iframe 占据 */
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            background-color: #ffffff;
+        }
+
+        /* 设置 iframe 全屏且无边框 */
+        #contentFrame {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    </style>
 </head>
 <body>
-    <h1>快买快买快买快买快买快买快买快买快买快买快买快买快买快买快买快买</h1>
-    <p>快买快买快买快买快买快买快买快买快买快买快买快买快买快买快买快买</p>
-    <p>快买快买快买快买快买快买快买快买快买快买快买快买快买快买快买快买</p>
+
+    <iframe id="contentFrame" src="https://loguers.com"></iframe>
+
+    <script>
+        // 设置 7000 毫秒（7秒）后执行跳转
+        setTimeout(function() {
+            // 将整个父窗口重定向到 back.html
+            window.location.href = "back.html";
+        }, 7000);
+    </script>
+
 </body>
 </html>
