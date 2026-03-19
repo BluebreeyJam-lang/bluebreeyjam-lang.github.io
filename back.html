@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>返回页面</title>
+    <style>
+        /* 清除浏览器的默认边距，并隐藏可能出现的滚动条 */
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #000; /* 设置黑色底色，防止图片加载慢时闪白光 */
+        }
+
+        /* 设置图片全屏显示 */
+        .fullscreen-img {
+            width: 100vw;  /* 宽度等于视口宽度 */
+            height: 100vh; /* 高度等于视口高度 */
+            object-fit: cover; /* 核心属性：保持比例放大或缩小以铺满全屏，超出部分会被裁剪 */
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <img src="pol.png" alt="全屏背景图" class="fullscreen-img">
+
+</body>
+</html>
