@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>极简音乐播放器 · 自动加载 file 目录</title>
+    <title>🎵 自动加载 · GitHub Pages 音乐播放器</title>
     <style>
         * {
             margin: 0;
@@ -26,9 +26,9 @@
             -webkit-backdrop-filter: blur(12px);
             border-radius: 56px;
             box-shadow: 0 25px 50px -8px rgba(0, 0, 0, 0.8), inset 0 2px 4px rgba(255, 255, 255, 0.06);
-            padding: 32px 28px 38px;
+            padding: 32px 28px 30px;
             width: 100%;
-            max-width: 420px;
+            max-width: 480px;
             border: 1px solid rgba(255, 255, 255, 0.04);
             transition: all 0.2s ease;
         }
@@ -36,7 +36,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-bottom: 24px;
+            margin-bottom: 18px;
         }
         .vinyl-icon {
             width: 96px;
@@ -48,7 +48,7 @@
             align-items: center;
             box-shadow: inset 0 -6px 8px rgba(0,0,0,0.6), 0 12px 24px rgba(0,0,0,0.5);
             border: 2px solid rgba(255, 215, 150, 0.15);
-            margin-bottom: 18px;
+            margin-bottom: 16px;
             transition: 0.3s;
         }
         .vinyl-icon span {
@@ -78,8 +78,63 @@
             font-weight: 300;
             letter-spacing: 0.3px;
         }
+        .playlist-area {
+            margin: 14px 0 16px;
+            max-height: 150px;
+            overflow-y: auto;
+            border-radius: 20px;
+            background: rgba(0,0,0,0.25);
+            padding: 6px 4px;
+            scrollbar-width: thin;
+            scrollbar-color: #4a6a8a transparent;
+        }
+        .playlist-area::-webkit-scrollbar {
+            width: 4px;
+        }
+        .playlist-area::-webkit-scrollbar-thumb {
+            background: #4a6a8a;
+            border-radius: 20px;
+        }
+        .playlist-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 14px;
+            border-radius: 40px;
+            color: #c8d8ec;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            gap: 10px;
+            border: 1px solid transparent;
+            margin-bottom: 2px;
+        }
+        .playlist-item:hover {
+            background: rgba(255,255,255,0.04);
+            border-color: rgba(255,255,255,0.03);
+        }
+        .playlist-item.active {
+            background: rgba(70, 130, 200, 0.25);
+            border-color: rgba(110, 180, 240, 0.2);
+            color: #fff;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+        }
+        .playlist-item .index {
+            opacity: 0.4;
+            font-size: 0.7rem;
+            min-width: 24px;
+        }
+        .playlist-item .name {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .playlist-item .status-icon {
+            font-size: 0.8rem;
+            opacity: 0.6;
+        }
         .progress-area {
-            margin: 24px 0 22px;
+            margin: 10px 0 14px;
         }
         .time-row {
             display: flex;
@@ -118,7 +173,7 @@
             justify-content: center;
             align-items: center;
             gap: 28px;
-            margin-top: 18px;
+            margin-top: 8px;
         }
         .ctrl-btn {
             background: rgba(220, 235, 255, 0.04);
@@ -167,13 +222,13 @@
         }
         .file-status {
             text-align: center;
-            margin-top: 24px;
+            margin-top: 16px;
             font-size: 0.75rem;
             color: #7a94b0;
             letter-spacing: 0.4px;
             font-weight: 300;
             border-top: 1px solid rgba(255,255,255,0.03);
-            padding-top: 18px;
+            padding-top: 14px;
             display: flex;
             justify-content: center;
             gap: 12px;
@@ -189,18 +244,22 @@
         .file-status .count {
             color: #b8d0e8;
         }
-        /* 适配小屏 */
+        .file-status .api-info {
+            color: #7fb9e0;
+            font-size: 0.65rem;
+        }
+        audio {
+            display: none;
+        }
         @media (max-width: 460px) {
-            .player-card { padding: 24px 18px 30px; border-radius: 40px; }
+            .player-card { padding: 22px 16px 22px; border-radius: 40px; }
             .ctrl-btn { width: 56px; height: 56px; font-size: 24px; }
             .ctrl-btn.play-btn { width: 68px; height: 68px; }
             .ctrl-btn svg { width: 28px; height: 28px; }
             .ctrl-btn.play-btn svg { width: 32px; height: 32px; }
             .song-title { font-size: 1.2rem; }
-        }
-        /* 隐藏原生音频 */
-        audio {
-            display: none;
+            .playlist-area { max-height: 120px; }
+            .playlist-item { padding: 6px 12px; font-size: 0.8rem; }
         }
     </style>
 </head>
@@ -208,11 +267,14 @@
 
 <div class="player-card">
     <div class="cover-area">
-        <div class="vinyl-icon">
-            <span>🎵</span>
-        </div>
+        <div class="vinyl-icon"><span>🎵</span></div>
         <div class="song-title" id="songTitle">加载歌曲...</div>
-        <div class="song-artist" id="songArtist">file 目录</div>
+        <div class="song-artist" id="songArtist">GitHub API 自动扫描</div>
+    </div>
+
+    <!-- 播放列表 -->
+    <div class="playlist-area" id="playlistContainer">
+        <div class="playlist-item" style="opacity:0.5;justify-content:center;">扫描中...</div>
     </div>
 
     <div class="progress-area">
@@ -238,8 +300,10 @@
     </div>
 
     <div class="file-status">
-        <span class="count" id="songCounter">0 / 0</span>
-        <span>📁 自动加载 file/</span>
+        <span class="count" id="songCounter">0 首</span>
+        <span>📁 file/ 目录</span>
+        <span id="scanStatus">🔄 正在扫描...</span>
+        <span class="api-info" id="apiInfo">🌐 GitHub API</span>
     </div>
 </div>
 
@@ -247,12 +311,15 @@
 
 <script>
     (function() {
-        // ---------- 核心配置 ----------
-        const AUDIO_DIR = 'file/';          // 音频文件夹 (相对路径)
-        // 支持常见音频格式 (根据实际文件调整)
-        const EXTENSIONS = ['mp3', 'wav', 'ogg', 'm4a', 'aac', 'flac'];
+        // ============================================================
+        //  配置
+        // ============================================================
+        const AUDIO_DIR = 'file/';
+        const SUPPORTED_EXT = ['mp3', 'wav', 'ogg', 'm4a', 'aac', 'flac', 'webm'];
 
-        // DOM 引用
+        // ============================================================
+        //  DOM 引用
+        // ============================================================
         const audio = document.getElementById('audioPlayer');
         const playBtn = document.getElementById('playBtn');
         const playIcon = document.getElementById('playIcon');
@@ -265,14 +332,21 @@
         const progressFill = document.getElementById('progressFill');
         const progressBarBg = document.getElementById('progressBarBg');
         const songCounter = document.getElementById('songCounter');
+        const playlistContainer = document.getElementById('playlistContainer');
+        const scanStatus = document.getElementById('scanStatus');
+        const apiInfo = document.getElementById('apiInfo');
 
-        // ---------- 状态 ----------
-        let playlist = [];                 // 存放 { name, src }
+        // ============================================================
+        //  状态
+        // ============================================================
+        let playlist = [];
         let currentIndex = 0;
         let isPlaying = false;
-        let isUserSeeking = false;         // 拖动进度条时避免更新冲突
+        let isUserSeeking = false;
 
-        // ---------- 辅助函数 ----------
+        // ============================================================
+        //  工具函数
+        // ============================================================
         function formatTime(seconds) {
             if (isNaN(seconds) || seconds === Infinity) return '0:00';
             const mins = Math.floor(seconds / 60);
@@ -280,26 +354,87 @@
             return `${mins}:${secs.toString().padStart(2, '0')}`;
         }
 
-        // 更新播放器 UI (标题/进度/计数器)
-        function updatePlayerUI() {
+        function getRepoInfo() {
+            // 从当前 URL 提取 GitHub 仓库信息
+            // 格式: https://用户名.github.io/仓库名/ 或 自定义域名
+            const url = window.location.href;
+            const match = url.match(/github\.io\/([^\/]+)(?:\/([^\/]+))?/);
+            if (match) {
+                const owner = match[1];
+                const repo = match[2] || owner; // 如果仓库名和用户名相同
+                return { owner, repo };
+            }
+            // 如果是自定义域名，尝试从路径获取
+            const pathMatch = window.location.pathname.match(/^\/([^\/]+)/);
+            if (pathMatch) {
+                // 这种情况无法准确获取 owner，返回 null
+                return null;
+            }
+            return null;
+        }
+
+        // ============================================================
+        //  渲染播放列表
+        // ============================================================
+        function renderPlaylist(activeIndex) {
+            if (!playlistContainer) return;
+            if (!playlist.length) {
+                playlistContainer.innerHTML = `<div class="playlist-item" style="opacity:0.5;justify-content:center;">暂无音频文件</div>`;
+                return;
+            }
+            let html = '';
+            playlist.forEach((item, idx) => {
+                const activeClass = (idx === activeIndex) ? 'active' : '';
+                const icon = (idx === activeIndex) ? (isPlaying ? '▶️' : '⏸️') : '🎵';
+                html += `
+                    <div class="playlist-item ${activeClass}" data-index="${idx}">
+                        <span class="index">${idx + 1}</span>
+                        <span class="name">${item.name}</span>
+                        <span class="status-icon">${icon}</span>
+                    </div>
+                `;
+            });
+            playlistContainer.innerHTML = html;
+
+            playlistContainer.querySelectorAll('.playlist-item').forEach(el => {
+                el.addEventListener('click', function() {
+                    const idx = parseInt(this.dataset.index, 10);
+                    if (!isNaN(idx) && idx !== currentIndex) {
+                        loadSong(idx);
+                        if (!isPlaying) {
+                            isPlaying = true;
+                            audio.play().catch(() => {});
+                            updatePlayButton();
+                        }
+                    } else if (idx === currentIndex) {
+                        togglePlay();
+                    }
+                });
+            });
+        }
+
+        // ============================================================
+        //  UI 更新
+        // ============================================================
+        function updateUI() {
             if (!playlist.length) {
                 songTitle.textContent = '没有歌曲';
-                songArtist.textContent = '请放入 file/ 目录';
-                songCounter.textContent = '0 / 0';
+                songArtist.textContent = '请检查 file/ 目录';
+                songCounter.textContent = '0 首';
+                renderPlaylist(-1);
                 return;
             }
             const song = playlist[currentIndex];
             songTitle.textContent = song.name || '未知曲目';
             songArtist.textContent = `📁 file  · ${currentIndex + 1} / ${playlist.length}`;
             songCounter.textContent = `${playlist.length} 首`;
+            renderPlaylist(currentIndex);
 
-            // 更新总时长 (当metadata加载后)
             if (audio.readyState >= 1 && !isNaN(audio.duration)) {
                 totalTimeEl.textContent = formatTime(audio.duration);
             } else {
                 totalTimeEl.textContent = '0:00';
             }
-            // 当前时间 & 进度条 (如果不在拖动状态)
             if (!isUserSeeking && audio.readyState >= 1) {
                 const current = audio.currentTime || 0;
                 currentTimeEl.textContent = formatTime(current);
@@ -309,73 +444,69 @@
             }
         }
 
-        // 加载指定索引的歌曲
+        // ============================================================
+        //  播放控制
+        // ============================================================
         function loadSong(index) {
             if (!playlist.length) return;
             if (index < 0) index = playlist.length - 1;
             if (index >= playlist.length) index = 0;
             currentIndex = index;
-
             const song = playlist[currentIndex];
             audio.src = song.src;
-            audio.load();  // 重置并加载metadata
-
-            // 更新UI (标题等)
-            updatePlayerUI();
-
-            // 如果当前是播放状态, 继续播放; 否则暂停
+            audio.load();
+            updateUI();
             if (isPlaying) {
                 audio.play().catch(err => {
-                    // 自动播放策略: 如果用户未交互, 可能会拒绝; 静默处理
                     console.warn('播放被拦截:', err);
                     isPlaying = false;
                     updatePlayButton();
+                    updateUI();
                 });
             } else {
                 audio.pause();
             }
         }
 
-        // 播放/暂停切换
         function togglePlay() {
             if (!playlist.length) return;
             if (audio.paused) {
                 audio.play().then(() => {
                     isPlaying = true;
                     updatePlayButton();
+                    updateUI();
                 }).catch(err => {
                     console.warn('播放失败:', err);
                     isPlaying = false;
                     updatePlayButton();
+                    updateUI();
                 });
             } else {
                 audio.pause();
                 isPlaying = false;
                 updatePlayButton();
+                updateUI();
             }
         }
 
-        // 更新播放按钮图标
         function updatePlayButton() {
             if (isPlaying) {
-                playIcon.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>'; // 暂停
+                playIcon.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
             } else {
-                playIcon.innerHTML = '<path d="M8 5v14l11-7z"/>'; // 播放
+                playIcon.innerHTML = '<path d="M8 5v14l11-7z"/>';
             }
+            renderPlaylist(currentIndex);
         }
 
-        // 上一首 / 下一首
         function prevSong() {
             if (!playlist.length) return;
             const newIndex = (currentIndex - 1 + playlist.length) % playlist.length;
             loadSong(newIndex);
-            // 如果当前是暂停状态，保持暂停，但是loadSong里根据isPlaying决定播放
-            // 但我们希望点击上一首后自动播放（符合多数播放器习惯）
             if (!isPlaying) {
-                // 如果当前暂停，点击上一首后自动播放
                 isPlaying = true;
                 audio.play().catch(() => {});
                 updatePlayButton();
+                updateUI();
             }
         }
 
@@ -387,122 +518,164 @@
                 isPlaying = true;
                 audio.play().catch(() => {});
                 updatePlayButton();
+                updateUI();
             }
         }
 
-        // ---------- 扫描 file 目录 (模拟自动加载) ----------
-        function scanFileDirectory() {
-            // 实际环境中无法直接列举目录，此处采用“预设 + 自动探测”策略。
-            // 我们通过尝试加载常见的文件名来构建播放列表。
-            // 为了更真实的“自动加载”，我们构造一组常见文件名。
-            // 如果你有具体的文件，可以手动修改此数组，或使用后端API。
-            // 这里我们使用一个常见歌曲名字列表 + 尝试多种扩展名。
-            const baseNames = [
-                'song1', 'song2', 'song3', 'song4', 'song5',
-                'track1', 'track2', 'track3', 'track4', 'track5',
-                'music1', 'music2', 'music3', 'music4', 'music5',
-                'demo', 'test', 'audio', 'melody', 'rhythm'
-            ];
-            // 实际部署时，你可以将 file 目录下的文件名硬编码，或者通过 AJAX 请求获取列表。
-            // 由于浏览器安全限制，我们无法直接读取文件夹，所以采用“探测”方式：
-            // 尝试加载 baseNames + 扩展名，如果文件存在则加入播放列表。
-            // 为了演示，我们内置了三个示例文件 (请确保 file/ 目录下有对应文件)
-            // 你可以替换为实际文件名，或者使用后端接口。
-            // 推荐：在真实项目中使用 API 获取文件列表。
-            // 这里我们采用“预置 + 尝试加载”的方式。
-            
-            // 重置播放列表
+        // ============================================================
+        //  🔥 核心：通过 GitHub API 自动扫描 file/ 目录
+        // ============================================================
+        async function scanWithGitHubAPI() {
+            scanStatus.textContent = '🔄 正在连接 GitHub API...';
+            apiInfo.textContent = '🌐 GitHub API';
             playlist = [];
-            const candidateNames = ['最爱', '起风了', '光年之外', '夜曲', '稻香', '晴天', '小幸运', '告白气球'];
-            // 为了快速演示，我们手动构造一些文件 (如果 file 目录下有这些文件就可以播放)
-            // 你也可以将下面的注释打开，替换成你 file 目录下的真实文件名。
-            // 注意：文件名不要包含中文？可以包含，但需要编码。
-            
-            // 方式1: 手动指定 (推荐，如果你知道文件名)
-            // 例如: const manualFiles = ['夏日微风.mp3', '钢琴曲.wav', '节奏感.ogg'];
-            // 但为了演示自动加载，我们尝试使用 baseNames + 扩展名，但实际浏览器无法探测文件存在，
-            // 因此更好的办法是让使用者通过后端或手动配置。
-            // 这里我采用混合: 假如 file/ 下有 'demo.mp3', 'test.wav', 'audio.ogg' 等。
-            // 为了确保播放器开箱即用，我写入几个常见的文件名，你可以在 file 目录下放这些文件。
-            
-            // ********** 重要: 请在 file/ 目录下放置你的音频文件 **********
-            // 这里我们预设三个文件 ( 请修改为你的实际文件名 )
-            const demoFiles = [
-                'demo.mp3',
-                'test.wav', 
-                'audio.ogg',
-                'music.mp3',
-                'track.mp3',
-                'song.mp3',
-                'melody.mp3',
-                'rhythm.mp3'
-            ];
-            
-            // 使用 fetch 尝试探测文件是否存在 (HEAD 请求)
-            // 但为了简洁且避免大量网络请求，我们直接使用预设列表。
-            // 如果你希望自动探测，可以遍历 demoFiles 并尝试 fetch。
-            // 但 fetch 存在跨域和预检问题，所以我们只做一个简单的“假设存在”。
-            // 最佳实践: 让后端提供接口返回文件列表。
-            
-            // 此处我们采用“用户自定义”：你可以直接修改下面的数组为你的实际文件。
-            // 例如: const userFiles = ['我的歌.mp3', '钢琴曲.wav', '节奏.ogg'];
-            // 为了演示，我使用一些常规名称，并构造完整路径。
-            // 生产环境请使用后端API获取文件列表。
-            
-            // 手动配置 ( 请将你的音频文件名填入下方数组 )
-            // ---------------------------------------------------------
-            // 请修改此处为你的实际文件名 (相对 file/ 目录)
-            const userFiles = [
+
+            const repoInfo = getRepoInfo();
+            if (!repoInfo) {
+                scanStatus.textContent = '⚠️ 无法识别仓库';
+                apiInfo.textContent = '❌ 请使用 GitHub Pages 域名';
+                fallbackToManual();
+                return;
+            }
+
+            const { owner, repo } = repoInfo;
+            // 注意：GitHub API 路径是 /repos/{owner}/{repo}/contents/{path}
+            const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${AUDIO_DIR}`;
+
+            try {
+                const response = await fetch(apiUrl, {
+                    headers: {
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+
+                if (response.status === 403) {
+                    // API 限流
+                    scanStatus.textContent = '⚠️ API 限流，使用备用列表';
+                    apiInfo.textContent = '⏳ 请稍后再试';
+                    fallbackToManual();
+                    return;
+                }
+
+                if (response.status === 404) {
+                    scanStatus.textContent = '❌ file/ 目录不存在';
+                    apiInfo.textContent = '📁 请创建 file/ 目录';
+                    fallbackToManual();
+                    return;
+                }
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                if (!Array.isArray(data)) {
+                    // 可能是单个文件响应
+                    scanStatus.textContent = '⚠️ 目录为空或格式错误';
+                    fallbackToManual();
+                    return;
+                }
+
+                // 过滤出音频文件
+                const audioFiles = data.filter(item => {
+                    if (item.type !== 'file') return false;
+                    const ext = item.name.split('.').pop().toLowerCase();
+                    return SUPPORTED_EXT.includes(ext);
+                });
+
+                if (audioFiles.length === 0) {
+                    scanStatus.textContent = '⚠️ 未找到音频文件';
+                    apiInfo.textContent = '📁 请放入音频文件';
+                    fallbackToManual();
+                    return;
+                }
+
+                audioFiles.forEach(item => {
+                    const name = item.name.replace(/\.[^/.]+$/, '');
+                    playlist.push({
+                        name: decodeURIComponent(name),
+                        src: AUDIO_DIR + item.name
+                    });
+                });
+
+                scanStatus.textContent = `✅ 扫描到 ${playlist.length} 个音频文件`;
+                apiInfo.textContent = `📊 GitHub API · ${playlist.length} 首`;
+
+            } catch (error) {
+                console.error('GitHub API 请求失败:', error);
+                scanStatus.textContent = '⚠️ 请求失败，使用备用列表';
+                apiInfo.textContent = '🌐 网络错误';
+                fallbackToManual();
+            }
+
+            // 加载第一首
+            if (playlist.length === 0) {
+                fallbackToManual();
+            } else {
+                finishLoading();
+            }
+        }
+
+        // ============================================================
+        //  备用方案：手动列表（作为 fallback）
+        // ============================================================
+        function fallbackToManual() {
+            // 👇👇👇 在这里修改你的备用文件列表 👇👇👇
+            const fallbackFiles = [
                 'demo.mp3',
                 'test.wav',
                 'audio.ogg',
                 'music.mp3',
                 'track.mp3'
             ];
-            // ---------------------------------------------------------
-            
-            // 如果 userFiles 有内容则使用，否则使用 demoFiles
-            const filesToUse = userFiles.length > 0 ? userFiles : demoFiles;
-            
-            filesToUse.forEach(filename => {
-                // 提取文件名（不含扩展名）用于显示
-                const dotIndex = filename.lastIndexOf('.');
-                const displayName = dotIndex > 0 ? filename.substring(0, dotIndex) : filename;
-                playlist.push({
-                    name: displayName,
-                    src: AUDIO_DIR + filename
-                });
+
+            playlist = [];
+            fallbackFiles.forEach(filename => {
+                const ext = filename.split('.').pop().toLowerCase();
+                if (SUPPORTED_EXT.includes(ext)) {
+                    const name = filename.replace(/\.[^/.]+$/, '');
+                    playlist.push({
+                        name: decodeURIComponent(name),
+                        src: AUDIO_DIR + filename
+                    });
+                }
             });
-            
-            // 如果 playlist 为空，添加一个占位提示
+
             if (playlist.length === 0) {
                 playlist.push({
-                    name: '示例歌曲 (请放入音频)',
+                    name: '请放入音频文件到 file/ 目录',
                     src: AUDIO_DIR + 'demo.mp3'
                 });
+                scanStatus.textContent = '📂 无文件，使用占位';
+            } else {
+                scanStatus.textContent = `📂 备用列表 (${playlist.length} 首)`;
             }
+            finishLoading();
+        }
 
-            // 加载第一首
+        // ============================================================
+        //  完成加载
+        // ============================================================
+        function finishLoading() {
             currentIndex = 0;
             if (playlist.length) {
                 loadSong(0);
-                // 默认暂停
                 audio.pause();
                 isPlaying = false;
                 updatePlayButton();
+                updateUI();
             }
-            updatePlayerUI();
+            renderPlaylist(currentIndex);
         }
 
-        // ---------- 事件绑定 ----------
-        // 播放/暂停
+        // ============================================================
+        //  事件绑定
+        // ============================================================
         playBtn.addEventListener('click', togglePlay);
-
-        // 上一首 / 下一首
         prevBtn.addEventListener('click', prevSong);
         nextBtn.addEventListener('click', nextSong);
 
-        // 音频事件: 播放时更新进度
         audio.addEventListener('timeupdate', function() {
             if (!isUserSeeking && audio.readyState >= 1) {
                 const current = audio.currentTime || 0;
@@ -514,18 +687,17 @@
         });
 
         audio.addEventListener('loadedmetadata', function() {
-            updatePlayerUI();
+            updateUI();
             if (!isUserSeeking) {
                 totalTimeEl.textContent = formatTime(audio.duration);
             }
         });
 
-        // 播放结束自动下一首
         audio.addEventListener('ended', function() {
             nextSong();
         });
 
-        // 进度条拖动 (点击跳转)
+        // 进度条拖动
         progressBarBg.addEventListener('mousedown', function(e) {
             if (!playlist.length || audio.readyState < 1) return;
             isUserSeeking = true;
@@ -539,7 +711,6 @@
             isUserSeeking = false;
         });
 
-        // 触摸事件支持
         progressBarBg.addEventListener('touchstart', function(e) {
             if (!playlist.length || audio.readyState < 1) return;
             e.preventDefault();
@@ -555,7 +726,7 @@
             isUserSeeking = false;
         }, { passive: false });
 
-        // 键盘快捷键 (空格 切换播放，左右箭头)
+        // 键盘快捷键
         document.addEventListener('keydown', function(e) {
             if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
             if (e.key === ' ' || e.key === 'Space') {
@@ -570,25 +741,31 @@
             }
         });
 
-        // 页面加载时扫描目录
-        window.addEventListener('DOMContentLoaded', function() {
-            scanFileDirectory();
-        });
-
-        // 当音频加载失败（文件不存在）时，尝试下一个
+        // 音频错误自动跳过
         audio.addEventListener('error', function() {
-            console.warn('音频加载失败，尝试下一首:', audio.src);
-            // 如果当前播放列表有歌曲，跳过
+            console.warn('音频加载失败:', audio.src);
             if (playlist.length > 1) {
-                nextSong();
-            } else {
-                // 单曲循环失败，显示提示
-                songTitle.textContent = '文件未找到';
-                songArtist.textContent = '请检查 file/ 目录';
+                const nextIdx = (currentIndex + 1) % playlist.length;
+                loadSong(nextIdx);
             }
         });
 
-        // 清理 (无)
+        // ============================================================
+        //  🚀 启动：优先使用 GitHub API
+        // ============================================================
+        window.addEventListener('DOMContentLoaded', function() {
+            // 检查是否在 GitHub Pages 环境
+            const isGitHubPages = window.location.hostname.includes('github.io');
+            if (isGitHubPages) {
+                scanWithGitHubAPI();
+            } else {
+                // 本地测试或其他环境，直接使用备用列表
+                scanStatus.textContent = '📂 本地模式';
+                apiInfo.textContent = '💻 使用备用列表';
+                fallbackToManual();
+            }
+        });
+
     })();
 </script>
 </body>
